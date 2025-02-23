@@ -168,7 +168,7 @@ export default {
         ],
         trafficData: [
             {
-                lastSeen: new Date(),
+                lastSeen: new Date().toISOString(),
                 duration: '2天 58:55',
                 protocol: 'UDP: BitTorrent',
                 score: 85,
@@ -179,7 +179,18 @@ export default {
                 throughput: '1.5 Mbps',
                 totalBytes: '43.03 GB'
             },
-            // 添加更多模拟数据...
+            {
+                lastSeen: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+                duration: '1天 12:30',
+                protocol: 'TCP: HTTPS',
+                score: 45,
+                flow: {
+                    source: '192.168.1.101:443',
+                    destination: '104.16.124.96:443'
+                },
+                throughput: '500 Kbps',
+                totalBytes: '2.5 GB'
+            }
         ]
     }),
     methods: {
@@ -223,8 +234,24 @@ export default {
             }
         },
         formatTime(time) {
-            // 格式化时间的逻辑
-            return '< 1秒';
+            if (!time) return '未知';
+            
+            const now = new Date();
+            const lastSeen = new Date(time);
+            const diffSeconds = Math.floor((now - lastSeen) / 1000);
+
+            if (diffSeconds < 60) {
+                return '< 1分钟';
+            } else if (diffSeconds < 3600) {
+                const minutes = Math.floor(diffSeconds / 60);
+                return `${minutes}分钟前`;
+            } else if (diffSeconds < 86400) {
+                const hours = Math.floor(diffSeconds / 3600);
+                return `${hours}小时前`;
+            } else {
+                const days = Math.floor(diffSeconds / 86400);
+                return `${days}天前`;
+            }
         },
         getScoreColor(score) {
             if (score >= 80) return 'red';

@@ -30,5 +30,6 @@ export default function () {
         { header: true, text: "NETWORK" },
         { dc: true, icon: 'mdi-chart-timeline-variant', text: '流量分析', path: '/network/traffic' },
         { dc: true, icon: 'mdi-ip-network', text: 'IPv6风险分析', path: '/network/ipv6' },
+        { dc: true, icon: 'mdi-map-marker-radius', text: 'IP地理分布', path: '/network/geo' },
     ]
 }

@@ -31,6 +31,9 @@ import HTTPLogger from "./views/exploit/http/HTTPLogger";
 
 import NetworkTraffic from "./views/network/NetworkTraffic";
 import IPv6Analysis from "./views/network/IPv6Analysis";
+import IPGeoMap from "./views/network/IPGeoMap";
+
+import PortRisk from "./views/risk/PortRisk";
 
 const routerPush = Router.prototype.push;
 Router.prototype.push = function push(location) {
@@ -148,6 +151,16 @@ export default new Router({
           path: '/network/ipv6',
           name: 'IPv6Analysis',
           component: IPv6Analysis
+        },
+        {
+          path: '/network/geo',
+          name: 'IPGeoMap',
+          component: IPGeoMap
+        },
+        {
+          path: '/risk/ports',
+          name: 'PortRisk',
+          component: PortRisk
         }
       ]
     },

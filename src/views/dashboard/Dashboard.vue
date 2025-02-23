@@ -247,7 +247,7 @@
                             {name: "3389(RDP)", count: Math.floor(data.port_risk_count * 0.22)}
                         ],
                         icon: "mdi-lan-connect",
-                        path: "/discovery/port/tasks",
+                        path: "/risk/ports",
                         color: "amber darken-2"
                     },
                     {
