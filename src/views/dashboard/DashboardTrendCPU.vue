@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div>
         <span class="subtitle-1 ml-1" v-if="value.length < 2">
         No CPU information
@@ -75,4 +75,4 @@
 
 <style scoped>
 
-</style>
+</style> -->

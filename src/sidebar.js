@@ -25,5 +25,10 @@ export default function () {
         { dc: true, icon: 'mdi-nodejs', text: 'Jsonp Hijacker', path: '/exploit/jsonp/tasks' },
         { dc: true, icon: 'mdi-anchor', text: 'XSS Hunter', path: '/exploit/xss/tasks' },
         { dc: true, icon: 'mdi-spider-web', text: 'HTTP Logger', path: '/exploit/http/result' },
+        
+        { divider: true },
+        { header: true, text: "NETWORK" },
+        { dc: true, icon: 'mdi-chart-timeline-variant', text: '流量分析', path: '/network/traffic' },
+        { dc: true, icon: 'mdi-ip-network', text: 'IPv6风险分析', path: '/network/ipv6' },
     ]
 }

@@ -12,86 +12,106 @@
         </v-card-title>
 
         <v-row class="mr-8 ml-2 mt-n4">
-            <v-col cols="3" v-for="(item, index) in countStatisticsItems" :key="index">
-                <v-card class="mx-auto"
-                        @click="goToPath(item.path)"
-                        color="teal lighten-1">
-                    <v-card-title>
-                        <v-row align="start" class="white--text">
-                            <div>
-                                <span class="ml-2 font-weight-black">{{item.text}}</span><br>
-                                <span class="ml-2">{{item.value}}</span>
+            <v-col 
+                cols="12" 
+                sm="6" 
+                md="3" 
+                v-for="(item, index) in riskCards" 
+                :key="index"
+            >
+                <v-card
+                    class="mx-auto"
+                    height="150"
+                    @click="goToPath(item.path)"
+                    :color="item.color"
+                    hover
+                    style="cursor: pointer"
+                >
+                    <v-card-title class="d-flex justify-space-between align-center">
+                        <div class="white--text">
+                            <div class="subtitle-1 font-weight-bold mb-2">{{item.text}}</div>
+                            
+                            <div v-if="item.type === 'risk-index'">
+                                <v-progress-circular
+                                    :value="item.value"
+                                    :color="item.scoreColor"
+                                    size="50"
+                                >
+                                    {{ item.value }}
+                                </v-progress-circular>
+                                <div class="mt-2">
+                                    <v-icon small :color="item.trendColor">{{ item.trendIcon }}</v-icon>
+                                    <span class="ml-1">较昨日{{ item.trend }}</span>
+                                </div>
                             </div>
-                        </v-row>
-                        <v-icon color="white" size="64">{{item.icon}}</v-icon>
+
+                            <div v-else-if="item.type === 'high-risk-addr'">
+                                <div class="text-h5">{{ item.activeCount }} / {{ item.totalCount }}</div>
+                                <v-progress-linear
+                                    :value="item.percentage"
+                                    color="red"
+                                    height="8"
+                                    class="mt-2"
+                                ></v-progress-linear>
+                                <v-chip x-small class="mt-2" dark>{{ item.source }}</v-chip>
+                            </div>
+
+                            <div v-else-if="item.type === 'port-risk'">
+                                <div class="text-h5">{{ item.value }}</div>
+                                <div class="mt-2">
+                                    <v-chip 
+                                        x-small 
+                                        v-for="port in item.topPorts" 
+                                        :key="port.name"
+                                        class="mr-1 mt-1"
+                                        dark
+                                    >
+                                        {{ port.name }}:{{ port.count }}
+                                    </v-chip>
+                                </div>
+                            </div>
+
+                            <div v-else-if="item.type === 'privacy-level'">
+                                <v-progress-circular
+                                    :value="item.safePercentage"
+                                    color="green"
+                                    size="50"
+                                >
+                                    {{ item.safePercentage }}%
+                                </v-progress-circular>
+                                <div class="mt-2">
+                                    <v-icon small :color="item.trendColor">{{ item.trendIcon }}</v-icon>
+                                    <span class="ml-1">较上周{{ item.trend }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <v-icon 
+                            color="white" 
+                            size="64"
+                            class="ml-auto"
+                        >
+                            {{item.icon}}
+                        </v-icon>
                     </v-card-title>
                 </v-card>
             </v-col>
         </v-row>
         <v-row class="ml-2 mr-8">
             <v-col cols="12">
-                <v-card class="mx-auto" min-height="150">
+                <v-card>
                     <v-card-title>
                         <v-list-item-action>
-                            <v-icon class="teal--text">mdi-calendar-sync-outline</v-icon>
+                            <v-icon class="teal--text">mdi-chart-line</v-icon>
                         </v-list-item-action>
                         <v-list-item-content class="ml-n3">
                             <v-list-item-title class="teal--text">
-                                <span>Running tasks</span>
+                                <span>安全风险趋势</span>
                             </v-list-item-title>
                         </v-list-item-content>
                     </v-card-title>
                     <v-card-text>
-                        <div v-if="runningTaskItems.length === 0" class="ml-1">
-                            <span class="subtitle-1">
-                                No tasks are currently running
-                            </span>
-                        </div>
-                        <v-simple-table v-if="runningTaskItems.length !== 0" class="mt-n4">
-                            <template v-slot:default>
-                                <thead>
-                                <tr>
-                                    <th class="text-left">Module</th>
-                                    <th class="text-left">Task Name</th>
-                                    <th class="text-left">Status</th>
-                                    <th class="text-left">OP</th>
-                                    <th class="text-left">Create Date</th>
-                                    <th class="text-left">Elapsed Time</th>
-                                    <th class="text-left">Action</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr v-for="item in runningTaskItems" :key="item.tid">
-                                    <td>{{ item.module |capitalize }}</td>
-                                    <td @click="goToModule(item['module'])">{{ item.name }}</td>
-                                    <td>
-                                        <v-btn v-if="item.status === 'running'" text icon class="amber--text" x-small>
-                                            <v-icon>mdi-checkbox-blank-circle</v-icon>
-                                        </v-btn>
-                                        <v-btn v-if="item.status === 'waiting'" text icon class="grey--text" x-small>
-                                            <v-icon>mdi-checkbox-blank-circle</v-icon>
-                                        </v-btn>
-                                        <v-btn v-if="item.status === 'completed'" text icon class="teal--text" x-small>
-                                            <v-icon>mdi-checkbox-blank-circle</v-icon>
-                                        </v-btn>
-                                    </td>
-                                    <td>{{ item.op }}</td>
-                                    <td>{{ item.date }}</td>
-                                    <td>{{ item['elapsed_time'] }}</td>
-                                    <td>
-                                        <v-tooltip bottom>
-                                            <template v-slot:activator="{ on }">
-                                                <v-btn v-on="on" @click="taskStop(item['celery_id'], item['table'], item['tid'])" color="error" icon>
-                                                    <v-icon>mdi-stop-circle-outline</v-icon>
-                                                </v-btn>
-                                            </template>
-                                            <span>STOP</span>
-                                        </v-tooltip>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </template>
-                        </v-simple-table>
+                        <DashboardRiskTrend/>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -99,31 +119,16 @@
                 <v-card>
                     <v-card-title>
                         <v-list-item-action>
-                            <v-icon class="teal--text">mdi-cpu-64-bit</v-icon>
+                            <v-icon class="teal--text">mdi-chart-pie</v-icon>
                         </v-list-item-action>
                         <v-list-item-content class="ml-n3">
                             <v-list-item-title class="teal--text">
-                                <span>CPU</span>
+                                <span>风险分布统计</span>
                             </v-list-item-title>
                         </v-list-item-content>
                     </v-card-title>
                     <v-card-text>
-                        <DashboardTrendCPU/>
-                    </v-card-text>
-                </v-card>
-                <v-card class="mt-6">
-                    <v-card-title>
-                        <v-list-item-action>
-                            <v-icon class="teal--text">mdi-memory</v-icon>
-                        </v-list-item-action>
-                        <v-list-item-content class="ml-n3">
-                            <v-list-item-title class="teal--text">
-                                <span>Memory</span>
-                            </v-list-item-title>
-                        </v-list-item-content>
-                    </v-card-title>
-                    <v-card-text>
-                        <DashboardTrendMemory/>
+                        <DashboardRiskDistribution/>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -132,100 +137,141 @@
 </template>
 
 <script>
-    import DashboardTrendCPU from "./DashboardTrendCPU";
-    import DashboardTrendMemory from "./DashboardTrendMemory";
+    import DashboardRiskTrend from "./DashboardRiskTrend";
+    import DashboardRiskDistribution from "./DashboardRiskDistribution";
     export default {
         name: "Dashboard",
         components: {
-            DashboardTrendCPU,
-            DashboardTrendMemory,
+            DashboardRiskTrend,
+            DashboardRiskDistribution,
         },
         data: () => ({
             spinShow: true,
-            countStatisticsItems: [
-                {text: "VULNERABILITY", value: 0, icon: "mdi-bug", path: "/scanner/poc/vul"},
-                {text: "XSS SHEEP", value: 0, icon: "mdi-card-account-details-outline", path: "/exploit/xss/result"},
-                {text: "SQL INJECTION", value: 0, icon: "mdi-needle", path: "/scanner/sqlmap/tasks"},
-                // {text: "JSONP SHEEP", value: 0, icon: "mdi-anchor", path: "/exploit/jsonp/result"},
-                {text: "HTTP LOG", value: 0, icon: "mdi-iframe-array-outline", path: "/exploit/http/result"},
+            riskCards: [
+                {
+                    type: 'risk-index',
+                    text: "当前综合风险指数",
+                    value: 75,
+                    icon: "mdi-gauge",
+                    path: "/risk/analysis",
+                    color: "deep-orange",
+                    scoreColor: "red",
+                    trend: "上升5%",
+                    trendIcon: "mdi-arrow-up",
+                    trendColor: "red"
+                },
+                {
+                    type: 'high-risk-addr',
+                    text: "S级高危地址",
+                    activeCount: 15,
+                    totalCount: 28642,
+                    percentage: 0.05,
+                    source: "宿舍区6号楼",
+                    icon: "mdi-alert-circle",
+                    path: "/risk/address",
+                    color: "red darken-1"
+                },
+                {
+                    type: 'port-risk',
+                    text: "暴露高危端口",
+                    value: 238,
+                    topPorts: [
+                        {name: "22(SSH)", count: 76},
+                        {name: "3389(RDP)", count: 52}
+                    ],
+                    icon: "mdi-lan-connect",
+                    path: "/risk/ports",
+                    color: "amber darken-2"
+                },
+                {
+                    type: 'privacy-level',
+                    text: "随机化地址占比",
+                    safePercentage: 68,
+                    trend: "提升12%",
+                    trendIcon: "mdi-arrow-up",
+                    trendColor: "green",
+                    icon: "mdi-shield-check",
+                    path: "/risk/privacy",
+                    color: "green"
+                }
             ],
-            runningTaskItems: [],
         }),
         mounted() {
-            this.getCount();
-            this.getRunningTaskList();
+            this.getDashboardData();
         },
         methods: {
             goToPath(path){
                 this.$router.push(path);
             },
-            getCount() {
-                this.$api.dashboard.count().then(res => {
-                    let response = res.data;
-                    let status = response['status'];
-                    let result = response['result'];
-                    if(status['status'] === "success") {
-                        for (let i=0; i<this.countStatisticsItems.length; i++) {
-                            if (this.countStatisticsItems[i].text === "VULNERABILITY") {
-                                this.countStatisticsItems[i].value = result['vuls']
-                            } else if(this.countStatisticsItems[i].text === "XSS SHEEP") {
-                                this.countStatisticsItems[i].value = result['xss']
-                            } else if (this.countStatisticsItems[i].text === "JSONP SHEEP") {
-                                this.countStatisticsItems[i].value = result['jsonp']
-                            } else if (this.countStatisticsItems[i].text === "HTTP LOG") {
-                                this.countStatisticsItems[i].value = result['http']
-                            } else if (this.countStatisticsItems[i].text === "SQL INJECTION") {
-                                this.countStatisticsItems[i].value = result['sqlmap']
-                            }
-                        }
-                    } else {
-                        this.$message.error(status['message']);
+            async getDashboardData() {
+                // 添加模拟数据
+                const mockData = {
+                    risk_index: 75,
+                    high_risk_count: 15,
+                    port_risk_count: 238,
+                    privacy_level: 68
+                };
+                this.updateRiskCards(mockData);
+            },
+            updateRiskCards(data) {
+                this.riskCards = [
+                    {
+                        type: 'risk-index',
+                        text: "当前综合风险指数",
+                        value: data.risk_index,
+                        icon: "mdi-gauge",
+                        path: "/scanner/poc/vul",
+                        color: "deep-orange",
+                        scoreColor: "red",
+                        trend: "上升5%",
+                        trendIcon: "mdi-arrow-up",
+                        trendColor: "red"
+                    },
+                    {
+                        type: 'high-risk-addr',
+                        text: "S级高危地址",
+                        activeCount: data.high_risk_count,
+                        totalCount: 28642,
+                        percentage: (data.high_risk_count / 28642) * 100,
+                        source: "宿舍区6号楼",
+                        icon: "mdi-alert-circle",
+                        path: "/discovery/port/result",
+                        color: "red darken-1"
+                    },
+                    {
+                        type: 'port-risk',
+                        text: "暴露高危端口",
+                        value: data.port_risk_count,
+                        topPorts: [
+                            {name: "22(SSH)", count: Math.floor(data.port_risk_count * 0.32)},
+                            {name: "3389(RDP)", count: Math.floor(data.port_risk_count * 0.22)}
+                        ],
+                        icon: "mdi-lan-connect",
+                        path: "/discovery/port/tasks",
+                        color: "amber darken-2"
+                    },
+                    {
+                        type: 'privacy-level',
+                        text: "随机化地址占比",
+                        safePercentage: data.privacy_level,
+                        trend: "提升12%",
+                        trendIcon: "mdi-arrow-up",
+                        trendColor: "green",
+                        icon: "mdi-shield-check",
+                        path: "/discovery/whatweb",
+                        color: "green"
                     }
-                })
-            },
-            getRunningTaskList() {
-                this.$api.dashboard.runningTaskList().then(res => {
-                    let response = res.data;
-                    let status = response['status'];
-                    let result = response['result'];
-                    if(status['status'] === "success") {
-                        this.runningTaskItems = result;
-                    } else {
-                        this.$message.error(status['message']);
-                    }
-                })
-            },
-            goToModule(module_name){
-                if (module_name === "sqlmap scanner") {
-                    this.$router.push('/scanner/sqlmap/tasks');
-                } else if (module_name === "port scanner") {
-                    this.$router.push('/discovery/port/tasks');
-                } else if (module_name === "whatweb scanner") {
-                    this.$router.push('/discovery/whatweb');
-                } else if (module_name === "subdomain scanner") {
-                    this.$router.push('/discovery/subdomain/tasks');
-                } else if (module_name === "poc scanner") {
-                    this.$router.push('/scanner/poc/tasks');
-                }
-            },
-            taskStop(celery_id, table, tid){
-                console.log(celery_id, table, tid);
-                this.$message.error("This feature is not available now");
-                // this.$api.dashboard.taskStop(celery_id, table, tid).then(res => {
-                //     let response = res.data;
-                //     let status = response['status'];
-                //     if(status['status'] === "success") {
-                //         this.$message.success(status['message']);
-                //         this.getRunningTaskList()
-                //     } else {
-                //         this.$message.error(status['message']);
-                //     }
-                // })
+                ];
             }
         }
     }
 </script>
 
 <style scoped>
-
+.v-card {
+    transition: transform 0.2s;
+}
+.v-card:hover {
+    transform: translateY(-5px);
+}
 </style>

@@ -1,0 +1,8 @@
+FROM mirrors.tencent.com/library/node:16-alpine
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN yarn config set registry https://registry.npmmirror.com/ && \
+    yarn install --production=false
+COPY . .
+EXPOSE 8089
+CMD ["npm", "run", "serve"]  # 使用开发服务器 

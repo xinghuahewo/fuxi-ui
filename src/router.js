@@ -29,6 +29,8 @@ import XSSHunter from "./views/exploit/xss/XSSHunter";
 import XSSTaskResult from "./views/exploit/xss/XSSTaskResult";
 import HTTPLogger from "./views/exploit/http/HTTPLogger";
 
+import NetworkTraffic from "./views/network/NetworkTraffic";
+import IPv6Analysis from "./views/network/IPv6Analysis";
 
 const routerPush = Router.prototype.push;
 Router.prototype.push = function push(location) {
@@ -135,6 +137,17 @@ export default new Router({
           path: '/exploit/http/result',
           name: 'HTTPLogger',
           component: HTTPLogger
+        },
+
+        {
+          path: '/network/traffic',
+          name: 'NetworkTraffic',
+          component: NetworkTraffic
+        },
+        {
+          path: '/network/ipv6',
+          name: 'IPv6Analysis',
+          component: IPv6Analysis
         }
       ]
     },
